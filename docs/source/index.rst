@@ -41,6 +41,7 @@ We look forward to seeing what you can do with Corda!
    node-internals-index.rst
    component-library-index.rst
    troubleshooting.rst
+   json.rst
 
 .. toctree::
    :caption: Operations
@@ -63,6 +64,7 @@ We look forward to seeing what you can do with Corda!
    design/hadr/design.md
    design/kafka-notary/design.md
    design/monitoring-management/design.md
+   design/sgx-integration/design.md
 
 .. toctree::
    :caption: Participate
@@ -70,5 +72,5 @@ We look forward to seeing what you can do with Corda!
 
    release-process-index.rst
    corda-repo-layout.rst
+   deterministic-modules.rst
    building-the-docs.rst
-   json.rst

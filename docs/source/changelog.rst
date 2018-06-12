@@ -7,11 +7,24 @@ release, see :doc:`upgrade-notes`.
 Unreleased
 ==========
 
+* Add ``devModeOptions.allowCompatibilityZone`` to re-enable the use of a compatibility zone and ``devMode``
+
+* Fixed an issue where ``trackBy`` was returning ``ContractStates`` from a transaction that were not being tracked. The
+  unrelated ``ContractStates`` will now be filtered out from the returned ``Vault.Update``.
+
+* Introducing the flow hospital - a component of the node that manages flows that have errored and whether they should
+  be retried from their previous checkpoints or have their errors propagate. Currently it will respond to any error that
+  occurs during the resolution of a received transaction as part of ``FinalityFlow``. In such a scenerio the receiving
+  flow will be parked and retried on node restart. This is to allow the node operator to rectify the situation as otherwise
+  the node will have an incomplete view of the ledger.
+
 * Fixed an issue preventing out of process nodes started by the ``Driver`` from logging to file.
 
 * Fixed an issue with ``CashException`` not being able to deserialise after the introduction of AMQP for RPC.
 
-* Removed -xmx VM argument from Explorer's Capsule setup. This helps avoiding out of memory errors.
+* Removed -Xmx VM argument from Explorer's Capsule setup. This helps avoiding out of memory errors.
+
+* New ``killFlow`` RPC for killing stuck flows.
 
 * Shell now kills an ongoing flow when CTRL+C is pressed in the terminal.
 
@@ -25,7 +38,12 @@ Unreleased
 
 * Improved audit trail for ``FinalityFlow`` and related sub-flows.
 
-* ``NodeStartup`` will now only print node's configuration if ``devMode`` is ``true``, avoiding the risk of printing passwords in a production setup.
+* Notary client flow retry logic was improved to handle validating flows better. Instead of re-sending flow messages the
+  entire flow is now restarted after a timeout. The relevant node configuration section was renamed from ``p2pMessagingRetry``,
+  to ``flowTimeout`` to reflect the behaviour change.
+
+* The node's configuration is only printed on startup if ``devMode`` is ``true``, avoiding the risk of printing passwords
+  in a production setup.
 
 * SLF4J's MDC will now only be printed to the console if not empty. No more log lines ending with "{}".
 
@@ -123,6 +141,10 @@ Unreleased
 
 * Table name with a typo changed from ``NODE_ATTCHMENTS_CONTRACTS`` to ``NODE_ATTACHMENTS_CONTRACTS``.
 
+* Node logs a warning for any ``MappedSchema`` containing a JPA entity referencing another JPA entity from a different ``MappedSchema`.
+  The log entry starts with `Cross-reference between MappedSchemas.`.
+  API: Persistence documentation no longer suggests mapping between different schemas.
+
 .. _changelog_v3.1:
 
 Version 3.1
@@ -131,7 +153,7 @@ Version 3.1
 * Update the fast-classpath-scanner dependent library version from 2.0.21 to 2.12.3
 
   .. note:: Whilst this is not the latest version of this library, that being 2.18.1 at time of writing, versions
-     later than 2.12.3 (including 2.12.4) exhibit a different issue.
+later than 2.12.3 (including 2.12.4) exhibit a different issue.
 
 * Updated the api scanner gradle plugin to work the same way as the version in master. These changes make the api scanner more
   accurate and fix a couple of bugs, and change the format of the api-current.txt file slightly. Backporting these changes
@@ -949,15 +971,15 @@ Special thank you to `Qian Hong <https://github.com/fracting>`_, `Marek Skocovsk
 to Corda in M10.
 
 .. warning:: Due to incompatibility between older version of IntelliJ and gradle 3.4, you will need to upgrade Intellij
-   to 2017.1 (with kotlin-plugin v1.1.1) in order to run Corda demos in IntelliJ. You can download the latest IntelliJ
+to 2017.1 (with kotlin-plugin v1.1.1) in order to run Corda demos in IntelliJ. You can download the latest IntelliJ
    from `JetBrains <https://www.jetbrains.com/idea/download/>`_.
 
 .. warning:: The Kapt-generated models are no longer included in our codebase. If you experience ``unresolved references``
-   errors when building in IntelliJ, please rebuild the schema model by running ``gradlew kaptKotlin`` in Windows or
+errors when building in IntelliJ, please rebuild the schema model by running ``gradlew kaptKotlin`` in Windows or
    ``./gradlew kaptKotlin`` in other systems. Alternatively, perform a full gradle build or install.
 
 .. note:: Kapt is used to generate schema model and entity code (from annotations in the codebase) using the Kotlin Annotation
-   processor.
+processor.
 
 * Corda DemoBench:
     * DemoBench is a new tool to make it easy to configure and launch local Corda nodes. A very useful tool to demonstrate
